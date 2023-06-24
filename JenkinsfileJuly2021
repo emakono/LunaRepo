@@ -19,12 +19,10 @@ node('wallmart-node'){
  {
   sh "${mavenHome}/bin/mvn clean package"
  }
-
 /*
  stage('SonarQubeReport'){
  sh "${mavenHome}/bin/mvn clean sonar:sonar"
  }
- 
  
  stage('UploadArtifactIntoNexus'){
  sh "${mavenHome}/bin/mvn clean deploy"
