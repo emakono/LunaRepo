@@ -4,64 +4,52 @@ agent any
 
 tools
 {
-  maven 'maven3.6.3'
-
+  maven 'maven3.9.2'
 }
-
 triggers{
  pollSCM('* * * * *')
 }
-
 options{
     timestamps()
-    buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '2', daysToKeepStr: '', numToKeepStr: '2'))
+    buildDiscarder(logRotator(artifactDaysToKeepStr: '5', artifactNumToKeepStr: '4', daysToKeepStr: '5', numToKeepStr: '4'))
 }
-
  stages{
    
-   stage('CheckoutCode')
+   stage('1.Clone')
    {
      steps{
-	 git branch: 'development', credentialsId: '8e348aa2-9531-4dbe-863d-1adb64897470', url: 'https://github.com/LandmakTechnology/maven-web-application.git'
+	 git branch: 'master', url: 'https://github.com/emakono/maven-freestyle-repo.git'
 	 }
    }
-   
-   stage('Build')
+   stage('2.Build')
    {
     steps{
 	  sh "mvn clean package"
 	 }
    }
-   
-    stage('ExecuteSonarQubeReport')
+    stage('3.codeQuality')
    {
      steps{
 	  sh "mvn sonar:sonar"
 	 }
    }
-   
-   stage('UploadArtifactintoNexus')
+   stage('uploadArtifact')
    {
      steps{
 	  sh "mvn deploy"
 	 }
    }
-   
-  stage('DeployAppIntoTomcat')
+  stage('Deploy2Prod')
  {
-   steps{
-  sshagent(['2b7b0c6a-5eff-4f4a-82c3-3630f91c70b5']) {
-  sh "scp -o StrictHostKeyChecking=no target/maven-web-application.war ec2-user@3.1.222.74:/opt/apache-tomcat-9.0.41/webapps/"
-  }
+	steps{
+		deploy adapters: [tomcat9(credentialsId: 'tomcat', path: '', url: 'http://44.202.45.9:8181/')], contextPath: null, war: 'target/*war'
+	 }
+    }
  }
- }
- 
-  
- 
+
  }
  
  post{
- 
  
  success{
  mail bcc: 'mylandmarktech@gmail.com', body: '''BuildOver!....
