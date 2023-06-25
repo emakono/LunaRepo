@@ -2,36 +2,36 @@ node{
 
  def mavenHome = tool name: "maven3.9.2"
 
- stage('CheckOutCode')
+ stage('1.GetCode')
  {
  git 'https://github.com/emakono/maven-freestyle-repo.git'
  }
  
- stage('Build')
+ stage('2.TestBuild')
  {
   sh "${mavenHome}/bin/mvn clean package"
  }
 
-/*
- stage('SonarQubeReport'){
+ stage('3.codeQuality'){
  sh "${mavenHome}/bin/mvn clean sonar:sonar"
  }
  
  
- stage('UploadArtifactIntoNexus'){
+ stage('4.uploadArtifact'){
  sh "${mavenHome}/bin/mvn clean deploy"
  }
  
- stage('DeployAppIntoTomcatServer')
- {
- sshagent(['c7a7b3d8-55f0-4f83-9e81-d56c154cc647']) {
-  sh "scp -o StrictHostKeyChecking=no target/maven-web-application.war ec2-user@15.206.90.6:/opt/apache-tomcat-9.0.52/webapps/"
- }
- }
- 
- */
- 
- stage('SendEmailNotification'){
+stage('5.deploy2UAT') 
+{
+    deploy adapters: [tomcat9(credentialsId: 'tomcat', path: '', url: 'http://52.90.7.41:8181/')], contextPath: null, war: 'target/*war'
+}
+
+stage('6.deploy2Production') 
+{
+    deploy adapters: [tomcat9(credentialsId: 'tomcat', path: '', url: 'http://52.90.7.41:8181/')], contextPath: null, war: 'target/*war'
+}
+
+ stage('7.Notification'){
    emailext body: '''Build is over !!
 
    Regards,
