@@ -3,7 +3,7 @@ node {
     
     stage('1.Clone') 
     {
-        git 'https://github.com/emakono/maven-freestyle-repo.git'	// public repo
+        git 'https://github.com/emakono/maven-freestyle-repo.git'	// public repo 
 		    //git branch: 'development', credentialsId: 'github', url: 'https://github.com/emakono/maven-freestyle-repo.git'
     }
     stage('2.TestBuild') 
