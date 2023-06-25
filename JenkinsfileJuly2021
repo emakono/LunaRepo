@@ -15,8 +15,7 @@ node{
  stage('3.codeQuality'){
  sh "${mavenHome}/bin/mvn clean sonar:sonar"
  }
- 
- 
+  
  stage('4.uploadArtifact'){
  sh "${mavenHome}/bin/mvn clean deploy"
  }
