@@ -1,41 +1,33 @@
-node{ 
-  def mavenHome = tool name: 'maven3.8.6'
-  stage('1cloneCode'){ 
-    git "https://github.com/LandmakTechnology/maven-web-application"
-  }
-  stage('2Test&Build'){
-    sh "${mavenHome}/bin/mvn clean package"
-    //bat "${mavenHome}/bin/mvn clean package"
-  }
-  stage('3codeQuality'){
-    sh "${mavenHome}/bin/mvn  sonar:sonar"
-  }
-  stage('4uploadArtifacts'){
-    //sh "${mavenHome}/bin/mvn deploy"
-    //http://52.53.227.31:8191/landmark/repository/tesla-fe-snapshots/
-    //http://52.53.227.31:8191/landmark/repository/tesla-fe-releases/
-    // vi pom.xml and added repository details   
-    // vi setting.xml and add AUTHENTICATION details  
-  } 
-  stage('5deploy2UAT'){
-    sh "echo 'deploy to UAT'  "
-    deploy adapters: [tomcat8(credentialsId: 'tomcat-credentials', path: '', url: 'http://35.170.249.131:8080/')], contextPath: null, war: 'target/*war'
-  }
-  stage('6approvalGate'){
-    sh "echo 'ready for review' "
-    timeout(time:5, unit:'DAYS') {
-    input message: 'Application ready for deployment, Please review and approve'
-      }
-  }
-  stage('7deploy2Prod'){
-    sh "sleep  50"
-    deploy adapters: [tomcat8(credentialsId: 'tomcat-credentials', path: '', url: 'http://35.170.249.131:8080/')], contextPath: null, war: 'target/*war'
-  }
-  stage('8emailNotification'){
-    emailext body: '''Hi All,
-
-Check Build status.
-
-Landmark Technologies''', recipientProviders: [buildUser(), developers(), upstreamDevelopers(), brokenBuildSuspects(), brokenTestsSuspects(), contributor()], subject: 'build status', to: 'tesla-app@gmail.com'
-  }
+node {
+    def mavenHome = tool name: "maven3.9.2"
+    
+    stage('1.Clone') 
+    {
+        git 'https://github.com/emakono/maven-freestyle-repo.git'	// public repo
+		    //git branch: 'development', credentialsId: 'github', url: 'https://github.com/emakono/maven-freestyle-repo.git'
+    }
+    stage('2.TestBuild') 
+    {
+        sh "${mavenHome}/bin/mvn clean package"
+    }
+    stage('3.codeQuality') 
+    {
+        sh "${mavenHome}/bin/mvn sonar:sonar"
+    }
+    stage('4.uploadArtefacts') 
+    {
+        sh "${mavenHome}/bin/mvn deploy"
+    }
+    stage('5.deploy2UAT') 
+    {
+        deploy adapters: [tomcat9(credentialsId: 'tomcat', path: '', url: 'http://44.202.45.9:8181/')], contextPath: null, war: 'target/*war'
+    }
+    stage('6.deploy2Production') 
+    {
+		deploy adapters: [tomcat9(credentialsId: 'tomcat', path: '', url: 'http://44.202.45.9:8181/')], contextPath: null, war: 'target/*war'
+    }
+    stage('7.Notification') 
+    {
+		emailext body: 'Build complete with notification.', recipientProviders: [upstreamDevelopers()], subject: 'Build status', to: 'Developers'
+    }
 }
