@@ -51,21 +51,10 @@ options{
  
  post{
  
- success{
  mail bcc: 'mylandmarktech@gmail.com', body: '''BuildOver!....
 
  Regards,
  Landmark Technologies,
- 9980923226''', cc: 'mylandmarktech@gmail.com', from: '', replyTo: '', subject: 'BuildOver!!', to: 'mylandmarktech@gmail.com'
- }
- 
- failure{
- mail bcc: 'devopstrainingblr@gmail.com', body: '''BuildOver!....
-
- Regards,
- Landmark Technologies,
- +1 437 215 2483,''', cc: 'mylandmarktech@gmail.com', from: '', replyTo: '', subject: 'BuildOver!!', to: 'mylandmarktech@gmail.com'
- }
- 
+ 9980923226''', cc: 'mylandmarktech@gmail.com', from: '', replyTo: '', subject: 'BuildOver!!', to: 'mylandmarktech@gmail.com' 
  }
 }
